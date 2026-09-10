@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Mind Illuminated</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Serif:ital@1&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* PsyCap palette mapped onto the Aurora token roles */
+  :root {
+    --ink: #000000;
+    --blue: #2151B5;          /* śamatha — text-safe */
+    --blue-pure: #5985E1;     /* śamatha — brand */
+    --violet: #6908C4;        /* vipassanā — text-safe */
+    --violet-pure: #8C1AF6;   /* vipassanā — brand */
+    --green: #5AC3A5;         /* accent / structure */
+    --white: #ffffff;
+    --ivory: #fbfaf8;
+    --mint: #e6f6f0;
+    --sky: #eaf0fc;
+    --lilac: #f2e9fd;
+    --ink-75: rgba(0, 0, 0, .74);
+    --ink-55: rgba(0, 0, 0, .54);
+    --ink-border: rgba(0, 0, 0, .15);
+    --ink-border-strong: rgba(0, 0, 0, .32);
+    --white-80: rgba(255, 255, 255, .87);
+    --font-heading: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --font-pali: "IBM Plex Serif", Georgia, serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-body);
+    background: var(--ivory); color: var(--ink);
+    padding: 22px 24px 30px;
+  }
+  .page { max-width: 1380px; margin: 0 auto; }
+  h1, h3, h4 { font-family: var(--font-heading); }
+
+  /* language switching */
+  .e, .s { display: none; }
+  body.en .e { display: inline; }
+  body.sv .s { display: inline; }
+  body.en li.e, body.en p.e, body.en dd.e, body.en div.e { display: block; }
+  body.sv li.s, body.sv p.s, body.sv dd.s, body.sv div.s { display: block; }
+
+  /* ---------- Header ---------- */
+  .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 22px; margin-bottom: 4px; flex-wrap: wrap; }
+  .title { font-family: var(--font-heading); font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; }
+  .title span { font-weight: 500; }
+  .subtitle { font-size: 12px; color: var(--ink-75); max-width: 560px; text-align: right; line-height: 1.45; }
+  .logo { height: 58px; width: auto; flex-shrink: 0; align-self: flex-start; }
+  .subtitle b { color: var(--ink); }
+
+  .toolbar { display: flex; align-items: center; gap: 14px; margin: 10px 0 14px; flex-wrap: wrap; }
+  .hint { font-size: 12px; color: var(--ink); font-weight: 600; }
+  .hint .gear { color: var(--ink-55); }
+  button.pill {
+    font-family: var(--font-body); font-size: 12px; font-weight: 700; color: var(--ink);
+    background: var(--white); border: 1.5px solid var(--ink); border-radius: 999px;
+    padding: 5px 14px; cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+  }
+  button.pill:hover { background: var(--green); border-color: var(--green); }
+  button.pill.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+  .langgroup { display: flex; gap: 6px; margin-left: auto; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 26px; font-size: 12px; color: var(--ink-75); margin-bottom: 18px; }
+  .legend b { color: var(--ink); font-weight: 700; }
+  .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+
+  /* ---------- Section labels ---------- */
+  .colhead { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.1px; color: var(--ink-55); margin-bottom: 8px; }
+  .bandhead {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    margin: 22px 0 10px;
+  }
+  .bandhead .b-title { font-family: var(--font-heading); font-size: 15px; font-weight: 700; }
+  .bandhead .b-sub { font-size: 12px; color: var(--ink-55); }
+  .milestone {
+    border-left: 4px solid var(--green); background: var(--mint);
+    border-radius: 8px; padding: 8px 12px; margin: 12px 0 4px;
+    font-size: 12.5px; line-height: 1.45;
+  }
+  .milestone b { font-weight: 700; }
+  .milestone i { font-style: normal; color: var(--ink-75); }
+
+  /* ---------- Flip cards ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 12px; }
+  .flip { perspective: 1400px; cursor: pointer; }
+  .stage-flip { height: 232px; }
+  .flip .inner { display: grid; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .5s; }
+  .flip.flipped .inner { transform: rotateY(180deg); }
+  .face {
+    grid-area: 1 / 1; overflow: hidden;
+    -webkit-backface-visibility: hidden; backface-visibility: hidden;
+    border-radius: 10px; padding: 12px 14px;
+    font-size: 12.5px;
+  }
+  .front { position: relative; background: var(--white); border: 1px solid var(--ink-border); border-left: 4px solid var(--ink-border-strong); }
+  .back { background: var(--ink); color: var(--white-80); transform: rotateY(180deg); border: 1px solid var(--ink); }
+
+  .front h3 { font-size: 1.12em; font-weight: 700; color: var(--ink); margin-bottom: .5em; line-height: 1.25; }
+  .front h3 .num, .back h3 .num {
+    display: inline-block; font-family: var(--font-mono); background: var(--ink); color: var(--white);
+    border-radius: 50%; width: 1.6em; height: 1.6em; line-height: 1.6em; text-align: center;
+    font-size: .82em; margin-right: .5em;
+  }
+  .back h3 { font-family: var(--font-heading); font-size: 1.04em; font-weight: 700; color: var(--green); margin-bottom: .45em; }
+  .back h3 .num { background: var(--green); color: var(--ink); }
+  .gearmark { position: absolute; top: 8px; right: 10px; font-size: 11px; color: var(--ink-border-strong); }
+  .flip:hover .front .gearmark { color: var(--violet-pure); }
+
+  .track { margin-bottom: .5em; line-height: 1.42; }
+  .track .lbl { font-size: .78em; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; display: block; }
+  .track.sam .lbl { color: var(--blue); }
+  .track.vip .lbl { color: var(--violet); }
+  .track.sam { color: var(--blue); }
+  .track.vip { color: var(--violet); }
+  .track span.body { font-size: .92em; }
+  .mastery { font-size: .86em; color: var(--ink-55); border-top: 1px solid var(--ink-border); padding-top: .45em; margin-top: .1em; }
+  .mastery b { color: var(--ink); font-weight: 600; }
+
+  .back ul { list-style: none; margin-top: .2em; }
+  .back li { font-size: .89em; line-height: 1.44; padding-left: 1em; position: relative; margin-bottom: .34em; }
+  .back li::before { content: "▸"; position: absolute; left: 0; color: var(--green); }
+  .back .sched {
+    display: inline-block; font-family: var(--font-mono); font-size: .74em; font-weight: 700;
+    color: var(--ink); background: var(--green); border-radius: 4px;
+    padding: .12em .55em; margin: 0 .35em .45em 0;
+  }
+
+  /* ---------- Reference cards (static) ---------- */
+  .refgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; align-items: start; }
+  .card { background: var(--white); border: 1px solid var(--ink-border); border-radius: 10px; padding: 12px 14px; }
+  .card h4 { font-size: 13.5px; font-weight: 700; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--ink-border); }
+  .card dl { margin: 0; font-size: 12px; }
+  .card dt { font-weight: 600; margin-top: 9px; line-height: 1.35; }
+  .card dt:first-child { margin-top: 0; }
+  .card dd { margin: 0; color: var(--ink-75); line-height: 1.44; }
+  .card p { font-size: 12px; line-height: 1.48; color: var(--ink-75); margin-bottom: 8px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card p b { color: var(--ink); font-weight: 700; }
+  em.p { font-family: var(--font-pali); font-style: italic; color: var(--ink-55); }
+  .card.tint-mint { background: var(--mint); border-color: transparent; }
+  .card.tint-sky { background: var(--sky); border-color: transparent; }
+  .card.tint-lilac { background: var(--lilac); border-color: transparent; }
+  .card.flagcard { border-left: 4px solid var(--violet-pure); }
+
+
+  /* ---------- Collapsible section ---------- */
+  .fold { margin: 22px 0 4px; }
+  .fold > summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    background: var(--white); border: 1px solid var(--ink-border); border-radius: 10px;
+    padding: 11px 14px; transition: border-color .15s, background .15s;
+  }
+  .fold > summary::-webkit-details-marker { display: none; }
+  .fold > summary:hover { border-color: var(--ink-border-strong); }
+  .fold > summary .b-title { font-family: var(--font-heading); font-size: 15px; font-weight: 700; }
+  .fold > summary .b-sub { font-size: 12px; color: var(--ink-55); }
+  .fold > summary .count {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--ink);
+    background: var(--mint); border-radius: 4px; padding: 2px 7px;
+  }
+  .fold > summary .chev { margin-left: auto; font-size: 13px; color: var(--ink-55); transition: transform .2s; }
+  .fold[open] > summary { background: var(--mint); border-color: transparent; }
+  .fold[open] > summary .count { background: var(--white); }
+  .fold[open] > summary .chev { transform: rotate(180deg); }
+  .fold .refgrid { margin-top: 12px; }
+
+  /* ---------- Facts ---------- */
+  .facts { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+  .fact { flex: 1; min-width: 140px; background: var(--ink); color: var(--white); border-radius: 8px; padding: 9px 10px; text-align: center; }
+  .fact .big { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--white); }
+  .fact.focal .big { color: var(--green); }
+  .fact .small { font-size: 9.5px; margin-top: 3px; line-height: 1.3; color: var(--white-80); }
+  .footnote { margin-top: 10px; font-size: 9.5px; color: var(--ink-55); text-align: right; }
+
+  @media (max-width: 700px) {
+    .subtitle { text-align: left; }
+    .langgroup { margin-left: 0; }
+  }
+</style>
+</head>
+<body class="sv">
+<div class="page">
+
+  <div class="header">
+    <div class="title">THE MIND ILLUMINATED <span class="s">· tio steg, två spår</span><span class="e">· ten stages, two tracks</span></div>
+    <div class="subtitle">
+      <span class="s"><b>Vad kartan gör:</b> Culadasa tränar śamatha och vipassanā parallellt genom hela stegen, inte i sekvens. Stegen mäter förmåga; the fetters mäter insikt — två olika frågor. Varje steg har ett mästerskapskriterium du kan diagnostisera dig mot.</span>
+      <span class="e"><b>What the map does:</b> Culadasa trains śamatha and vipassanā in parallel throughout, not in sequence. The stages measure capability; the fetters measure insight — two different questions. Every stage has a mastery criterion you can diagnose yourself against.</span>
+    </div>
+    <img class="logo" alt="" src="data:image/png;base64,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">
+  </div>
+
+  <div class="toolbar">
+    <span class="hint"><span class="gear">⚙</span>
+      <span class="s">Klicka på ett steg för att se hur du praktiskt gör — klicka igen för att gå tillbaka.</span>
+      <span class="e">Click a stage to see how you actually practise it — click again to go back.</span>
+    </span>
+    <button class="pill" id="toggleAll"><span class="s">Visa praktiken på alla steg</span><span class="e">Show the practice on every stage</span></button>
+    <span class="langgroup">
+      <button class="pill active" id="b-sv" onclick="setLang('sv')">Svenska</button>
+      <button class="pill" id="b-en" onclick="setLang('en')">English</button>
+    </span>
+  </div>
+
+  <div class="legend">
+    <span><span class="swatch" style="background:var(--blue-pure)"></span><b>Śamatha</b><span class="s"> — stabil uppmärksamhet</span><span class="e"> — stable attention</span></span>
+    <span><span class="swatch" style="background:var(--violet-pure)"></span><b>Vipassanā</b><span class="s"> — insikt</span><span class="e"> — insight</span></span>
+    <span><span class="swatch" style="background:var(--green)"></span><span class="s">Milstolpe — en förmåga som låser upp nästa grupp</span><span class="e">Milestone — a capability that unlocks the next group</span></span>
+  </div>
+
+  <!-- ================= NOVICE ================= -->
+  <div class="bandhead">
+    <span class="b-title"><span class="s">Novis</span><span class="e">Novice</span></span>
+    <span class="b-sub"><span class="s">Steg 1–3 · att få uppmärksamheten att stanna kvar</span><span class="e">Stages 1–3 · getting attention to stay put</span></span>
+  </div>
+
+  <div class="grid">
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">1</span><span class="s">Etablera praktiken</span><span class="e">Establishing a practice</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Vana, hållning, sexpunktsförberedelsen. Ingen stabilitet ännu.</span><span class="body e">Habit, posture, the six-point preparation. No stability yet.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Ingen formell insikt. Du möter motstånd, otålighet och uttråkning.</span><span class="body e">No formal insight. You meet resistance, impatience and boredom.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> missar aldrig ett pass.</span><span class="e"><b>Mastery:</b> never miss a session.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">1</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Bestäm fast tid och plats. Samma varje dag slår längre pass.</li>
+          <li class="s">Kör sexpunktsförberedelsen: motivation, mål, förväntningar (släpp dem), diligence, distraktioner, hållning.</li>
+          <li class="s">Fyrstegsövergång in: öppen medvetenhet → kroppen → andningen i kroppen → andningen vid näsan.</li>
+          <li class="s">Håll passet kort nog att du alltid orkar. 10–15 minuter räcker.</li>
+          <li class="s">Mät en enda sak: satt jag idag? Kvaliteten på passet är irrelevant här.</li>
+          <li class="e">Fix a time and a place. Same time daily beats longer sessions.</li>
+          <li class="e">Run the six-point preparation: motivation, goals, expectations (drop them), diligence, distractions, posture.</li>
+          <li class="e">Four-step transition in: open awareness → the body → the breath in the body → the breath at the nose.</li>
+          <li class="e">Keep sessions short enough that you always show up. 10–15 minutes is enough.</li>
+          <li class="e">Track one thing only: did I sit today? Session quality is irrelevant here.</li>
+        </ul>
+      </div>
+    </div></div>
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">2</span><span class="s">Avbruten uppmärksamhet</span><span class="e">Interrupted attention</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Korta ned mind-wandering. Återvänd, om och om igen.</span><span class="body e">Shorten mind-wandering. Come back, over and over.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Spontan introspektiv medvetenhet — sinnet ser sin egen aktivitet för första gången.</span><span class="body e">Spontaneous introspective awareness — the mind sees its own activity for the first time.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> vandringen varar sekunder.</span><span class="e"><b>Mastery:</b> wandering lasts seconds.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">2</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Andningen vid näsan är objektet. Inget annat behöver göras.</li>
+          <li class="s">När du upptäcker att du vandrat: notera ögonblicket med uppskattning, inte självkritik.</li>
+          <li class="s">Uppskattningen är själva träningen — den förstärker den spontana introspektionen som fångade dig.</li>
+          <li class="s">Vid monkey mind: förankra i kroppen några andetag innan du går tillbaka.</li>
+          <li class="s">Förvänta dig inte färre avbrott, utan kortare. Det är den enda kurvan som rör sig här.</li>
+          <li class="e">The breath at the nose is the object. Nothing else needs doing.</li>
+          <li class="e">When you notice you wandered: mark the moment with appreciation, not self-criticism.</li>
+          <li class="e">The appreciation is the training — it reinforces the spontaneous introspection that caught you.</li>
+          <li class="e">For monkey mind: ground in the body for a few breaths before returning.</li>
+          <li class="e">Don't expect fewer interruptions, expect shorter ones. That's the only curve moving here.</li>
+        </ul>
+      </div>
+    </div></div>
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">3</span><span class="s">Utökad uppmärksamhet</span><span class="e">Extended attention</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">De fyra färdigheterna: following, connecting, labeling, checking in.</span><span class="body e">The four skills: following, connecting, labeling, checking in.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Labeling är proto-noting. Introspektionen blir kontinuerlig istället för sporadisk.</span><span class="body e">Labeling is proto-noting. Introspection becomes continuous rather than sporadic.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> sällan forgetting.</span><span class="e"><b>Mastery:</b> forgetting is rare.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">3</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s"><b>Following:</b> hitta andetagets exakta början, slut och de två pauserna.</li>
+          <li class="s"><b>Connecting:</b> jämför inandning mot utandning, detta andetag mot förra. Intresse är motmedlet mot dvala.</li>
+          <li class="s"><b>Labeling:</b> sätt en kort etikett på distraktionen i samma ögonblick du ser den, återgå.</li>
+          <li class="s"><b>Checking in:</b> kolla periodiskt vad sinnet just gjorde — utan att lämna andningen.</li>
+          <li class="s">Somnar du: djupare andetag, räta upp ryggen, öppna ögonen på glänt.</li>
+          <li class="e"><b>Following:</b> find the breath's exact start, end and the two pauses.</li>
+          <li class="e"><b>Connecting:</b> compare in-breath to out-breath, this breath to the last. Interest is the antidote to dullness.</li>
+          <li class="e"><b>Labeling:</b> tag the distraction the moment you see it, then return.</li>
+          <li class="e"><b>Checking in:</b> periodically look at what the mind just did — without leaving the breath.</li>
+          <li class="e">If you nod off: deeper breaths, straighten the spine, open the eyes slightly.</li>
+        </ul>
+      </div>
+    </div></div>
+
+  </div>
+
+  <div class="milestone">
+    <span class="s"><b>Milstolpe 1</b> <i>— kontinuerlig uppmärksamhet på objektet. Ingen forgetting.</i></span>
+    <span class="e"><b>Milestone 1</b> <i>— continuous attention to the object. No forgetting.</i></span>
+  </div>
+
+  <!-- ================= SKILLED ================= -->
+  <div class="bandhead">
+    <span class="b-title"><span class="s">Skicklig meditatör</span><span class="e">Skilled meditator</span></span>
+    <span class="b-sub"><span class="s">Steg 4–6 · att göra uppmärksamheten skarp istället för bara närvarande</span><span class="e">Stages 4–6 · making attention sharp rather than merely present</span></span>
+  </div>
+
+  <div class="grid">
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">4</span><span class="s">Kontinuerlig uppmärksamhet</span><span class="e">Continuous attention</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Besegra grov distraktion och stark dvala.</span><span class="body e">Overcome gross distraction and strong dullness.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Purifikationer bubblar upp. Jämnmod inför smärta och emotion är tidigt insiktsarbete.</span><span class="body e">Purifications surface. Equanimity toward pain and emotion is early insight work.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> inga grova störningar.</span><span class="e"><b>Mastery:</b> no gross distraction or strong dullness.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">4</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Låt den introspektiva medvetenheten gå som tidig varning: fånga distraktionen medan den fortfarande är i bakgrunden.</li>
+          <li class="s">Jaga inte bort distraktioner. Låt dem finnas i perifer medvetenhet medan andningen behåller fokus.</li>
+          <li class="s">Balansera kraften: för mycket ger agitation, för lite ger dvala. Justera under passets gång.</li>
+          <li class="s">Smärta: flytta inte direkt. Observera opartiskt först — det är själva övningen.</li>
+          <li class="s">Purifikationer (minnen, tårar, oro): låt komma och gå utan att göra en berättelse av det.</li>
+          <li class="e">Run introspective awareness as an early warning: catch the distraction while it's still in the background.</li>
+          <li class="e">Don't chase distractions away. Let them sit in peripheral awareness while the breath holds focus.</li>
+          <li class="e">Balance the effort: too much brings agitation, too little brings dullness. Adjust mid-session.</li>
+          <li class="e">Pain: don't move immediately. Observe impartially first — that is the practice.</li>
+          <li class="e">Purifications (memories, tears, unease): let them come and go without building a story.</li>
+        </ul>
+      </div>
+    </div></div>
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">5</span><span class="s">Övervinn subtil dvala</span><span class="e">Overcoming subtle dullness</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Body scanning höjer mindfulness kraft, inte bara dess riktning.</span><span class="body e">Body scanning raises the power of mindfulness, not just its direction.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Helkroppssensationer är första riktiga marken för att se anicca direkt.</span><span class="body e">Whole-body sensation is the first real ground for seeing anicca directly.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> mindfulness håller eller ökar.</span><span class="e"><b>Mastery:</b> mindfulness holds or grows.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">5</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Body scanning: förankra på andningen vid buken, flytta uppmärksamheten till en kroppsdel i taget och sök andningsrelaterade sensationer där.</li>
+          <li class="s">Öka mängden detalj du håller i andetaget. Mer information motverkar dvala direkt.</li>
+          <li class="s">Testa regelbundet: är objektet lika levande nu som i början av passet?</li>
+          <li class="s">Energisera <b>innan</b> du fortsätter sitta, inte efter passet. Djupa andetag, spänn musklerna, öppna ögonen.</li>
+          <li class="s">Två varningstecken efteråt: skarpt ryck vid oväntat ljud, eller disig känsla. Båda betyder dvala, inte djup.</li>
+          <li class="e">Body scanning: anchor on the breath at the abdomen, move attention through one body part at a time, looking for breath-related sensation there.</li>
+          <li class="e">Increase the detail you hold in the breath. More information counteracts dullness directly.</li>
+          <li class="e">Test regularly: is the object as vivid now as at the start of the session?</li>
+          <li class="e">Energise <b>before</b> continuing to sit, not after the session. Deep breaths, tense the muscles, open the eyes.</li>
+          <li class="e">Two warning signs afterwards: a sharp startle at a sound, or a foggy feeling. Both mean dullness, not depth.</li>
+        </ul>
+      </div>
+    </div></div>
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">6</span><span class="s">Kväs subtil distraktion</span><span class="e">Subduing subtle distraction</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Exklusiv uppmärksamhet med medvetet definierat scope.</span><span class="body e">Exclusive attention with a deliberately defined scope.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Metakognitiv introspektiv medvetenhet — vittnespositionen som insiktspraktik körs på.</span><span class="body e">Metacognitive introspective awareness — the observing stance insight practice runs on.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> exklusivt fokus.</span><span class="e"><b>Mastery:</b> exclusive attention.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">6</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Bestäm fokusets omfång uttryckligen: bara näsvingarna, eller hela kroppen som andas. Håll det.</li>
+          <li class="s">Öka detaljrikedomen inom det omfånget tills subtila distraktioner inte får plats.</li>
+          <li class="s">Håll en känsla av sinnets tillstånd kvar i bakgrunden hela passet — det är den metakognitiva medvetenheten.</li>
+          <li class="s">Subtil distraktion är uppmärksamhet som alternerar. Du märker den som ett svagt drag, inte som en tanke.</li>
+          <li class="s">Här blir formell insiktspraktik först meningsfull. Innan dess saknas stabiliteten att bära den.</li>
+          <li class="e">Set the scope of focus explicitly: just the nostrils, or the whole body breathing. Hold it.</li>
+          <li class="e">Increase the level of detail inside that scope until subtle distractions have no room.</li>
+          <li class="e">Keep a sense of the mind's state in the background throughout — that's metacognitive awareness.</li>
+          <li class="e">Subtle distraction is attention alternating. You notice it as a faint pull, not as a thought.</li>
+          <li class="e">This is where formal insight practice first becomes meaningful. Before this the stability isn't there to carry it.</li>
+        </ul>
+      </div>
+    </div></div>
+
+  </div>
+
+  <div class="milestone">
+    <span class="s"><b>Milstolpe 2</b> <i>— ihållande exklusiv uppmärksamhet. Metakognitiv medvetenhet på plats.</i></span>
+    <span class="e"><b>Milestone 2</b> <i>— sustained exclusive attention. Metacognitive awareness in place.</i></span>
+  </div>
+
+  <!-- ================= TRANSITION ================= -->
+  <div class="bandhead">
+    <span class="b-title"><span class="s">Övergång</span><span class="e">Transition</span></span>
+    <span class="b-sub"><span class="s">Steg 7 · från ansträngning till ansträngningslöshet</span><span class="e">Stage 7 · from effort to effortlessness</span></span>
+  </div>
+
+  <div class="grid">
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">7</span><span class="s">Exklusiv uppmärksamhet, enande</span><span class="e">Exclusive attention, unifying the mind</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Släpp ansträngningen. Pacificering av det diskriminerande sinnet.</span><span class="body e">Let go of effort. Pacification of the discriminating mind.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">TMI:s rekommenderade ingång för formell insiktspraktik och jhāna.</span><span class="body e">TMI's recommended entry point for formal insight practice and jhāna.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> ansträngningslös stabilitet.</span><span class="e"><b>Mastery:</b> effortless stability.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">7</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Fortsätt anstränga dig tills ansträngningen blir onödig. Att släppa för tidigt kastar dig tillbaka till steg 4.</li>
+          <li class="s">Testa med jämna mellanrum: släpp all ansträngning i några andetag och se om stabiliteten håller sig själv.</li>
+          <li class="s">Lägg till pacifying the mind eller still point — vila i medvetenheten själv istället för på ett objekt.</li>
+          <li class="s">Här kan jhāna och formell insiktspraktik läggas in. Båda är valfria, ingen av dem krävs för nästa steg.</li>
+          <li class="s">Vanligaste fällan är uttråkning och tvivel, inte distraktion. Diligence är motmedlet.</li>
+          <li class="e">Keep applying effort until effort becomes unnecessary. Letting go too early drops you back to stage 4.</li>
+          <li class="e">Test periodically: release all effort for a few breaths and see whether stability holds itself.</li>
+          <li class="e">Add pacifying the mind or still point — resting in awareness itself rather than on an object.</li>
+          <li class="e">Jhāna and formal insight practice can enter here. Both are optional; neither is required for the next stage.</li>
+          <li class="e">The common trap is boredom and doubt, not distraction. Diligence is the antidote.</li>
+        </ul>
+      </div>
+    </div></div>
+
+  </div>
+
+  <div class="milestone">
+    <span class="s"><b>Milstolpe 3</b> <i>— ansträngningslös stabilitet. Mental pliancy.</i></span>
+    <span class="e"><b>Milestone 3</b> <i>— effortless stability. Mental pliancy.</i></span>
+  </div>
+
+  <!-- ================= ADEPT ================= -->
+  <div class="bandhead">
+    <span class="b-title"><span class="s">Adept</span><span class="e">Adept</span></span>
+    <span class="b-sub"><span class="s">Steg 8–10 · frukterna mognar och följer med ut i vardagen</span><span class="e">Stages 8–10 · the fruits mature and follow you off the cushion</span></span>
+  </div>
+
+  <div class="grid">
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">8</span><span class="s">Mental smidighet, stilla sinnena</span><span class="e">Mental pliancy, pacifying the senses</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Pliancy, piti grad V, djupare jhāna. Sinnena tystnar.</span><span class="body e">Pliancy, grade V pīti, deeper jhāna. The senses quieten.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Upplevelsen ses konstrueras ögonblick för ögonblick — ingången till śūnyatā.</span><span class="body e">Experience is seen being constructed moment by moment — the way into śūnyatā.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> fysisk pliancy och glädje.</span><span class="e"><b>Mastery:</b> physical pliancy and joy.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">8</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Gör mindre, inte mer. Pacificeringen sker av sig själv när uppmärksamheten är ansträngningslös.</li>
+          <li class="s">Arbeta med hela kroppen som andas, eller vila i still point.</li>
+          <li class="s">Nimitta (inre ljus) kan dyka upp. Behandla det som en skylt, inte ett mål — jaga det inte.</li>
+          <li class="s">Piti kan bli kroppsligt intensivt. Låt det vara utan att förstärka eller dämpa.</li>
+          <li class="s">Fördjupa i jhāna om du vill. Det är ett stöd, inte ett krav.</li>
+          <li class="e">Do less, not more. Pacification happens by itself once attention is effortless.</li>
+          <li class="e">Work with the whole body breathing, or rest in the still point.</li>
+          <li class="e">Nimitta (inner light) may appear. Treat it as a signpost, not a goal — don't chase it.</li>
+          <li class="e">Pīti can get physically intense. Let it be without amplifying or suppressing.</li>
+          <li class="e">Deepen into jhāna if you want. It's a support, not a requirement.</li>
+        </ul>
+      </div>
+    </div></div>
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">9</span><span class="s">Lugna glädjens intensitet</span><span class="e">Calming the intensity of joy</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Glädjen mognar till tranquility.</span><span class="body e">Joy matures into tranquility.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Jämnmod öppnar för rent seende av dukkha och anattā.</span><span class="body e">Equanimity opens clean seeing of dukkha and anattā.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> glädjen lägger sig.</span><span class="e"><b>Mastery:</b> joy settles, equanimity holds.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">9</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Lägg inte till någon ny teknik. Fortsätt sitta och låt intensiteten mogna.</li>
+          <li class="s">Håll inte fast vid piti. Det är fasthållandet som håller den uppspelt.</li>
+          <li class="s">Jämnmod växer exakt i takt med att du slutar reagera på glädjen.</li>
+          <li class="s">Insiktspraktik blir alltmer huvudsaken; stabiliteten sköter sig själv.</li>
+          <li class="e">Add no new technique. Keep sitting and let the intensity mature.</li>
+          <li class="e">Don't hold on to pīti. The holding is what keeps it agitated.</li>
+          <li class="e">Equanimity grows exactly as fast as you stop reacting to the joy.</li>
+          <li class="e">Insight practice increasingly becomes the main work; stability now takes care of itself.</li>
+        </ul>
+      </div>
+    </div></div>
+
+    <div class="flip stage-flip"><div class="inner">
+      <div class="face front"><span class="gearmark">⚙</span>
+        <h3><span class="num">10</span><span class="s">Stillhet och jämnmod</span><span class="e">Tranquility and equanimity</span></h3>
+        <div class="track sam"><span class="lbl">Śamatha</span><span class="body s">Śamatha komplett och buret ut ur passet.</span><span class="body e">Śamatha complete and carried off the cushion.</span></div>
+        <div class="track vip"><span class="lbl">Vipassanā</span><span class="body s">Full grund för de fem insikterna: anicca, dukkha, anattā, śūnyatā, orsaksberoende.</span><span class="body e">Full basis for the five insights: anicca, dukkha, anattā, śūnyatā, causal interdependence.</span></div>
+        <div class="mastery"><span class="s"><b>Mästerskap:</b> kvaliteterna består i timmar.</span><span class="e"><b>Mastery:</b> qualities persist for hours.</span></div>
+      </div>
+      <div class="face back">
+        <h3><span class="num">10</span><span class="s">Så gör du</span><span class="e">How you practise</span></h3>
+        <ul>
+          <li class="s">Fortsätt sitta regelbundet. Det är hela underhållet.</li>
+          <li class="s">Märk hur länge kvaliteterna följer med efter passet — det är måttet på steg 10.</li>
+          <li class="s">Gränsen mellan meditation och icke-meditation börjar suddas ut.</li>
+          <li class="s">Härifrån är arbetet insikt, inte stabilitet. Stegen är slut; the fetters tar vid.</li>
+          <li class="e">Keep sitting regularly. That is the whole maintenance.</li>
+          <li class="e">Notice how long the qualities follow you after the session — that's the measure of stage 10.</li>
+          <li class="e">The line between meditation and non-meditation starts to blur.</li>
+          <li class="e">From here the work is insight, not stability. The stages end; the fetters take over.</li>
+        </ul>
+      </div>
+    </div></div>
+
+  </div>
+
+  <div class="milestone">
+    <span class="s"><b>Milstolpe 4</b> <i>— śamatha består mellan passen. Gränsen meditation / icke-meditation suddas ut.</i></span>
+    <span class="e"><b>Milestone 4</b> <i>— śamatha persists between sessions. The line between meditation and non-meditation blurs.</i></span>
+  </div>
+
+  <!-- ================= VOCABULARY (collapsible) ================= -->
+  <details class="fold" id="vocab">
+    <summary>
+      <span class="b-title"><span class="s">Vokabulären</span><span class="e">The vocabulary</span></span>
+      <span class="count">38</span>
+      <span class="b-sub"><span class="s">Culadasa laddar om gamla termer med mycket precisa betydelser — klicka för att fälla ut</span><span class="e">Culadasa reloads old terms with very precise meanings — click to expand</span></span>
+      <span class="chev">▾</span>
+    </summary>
+  <div class="refgrid">
+
+    <div class="card">
+      <h4><span class="s">Uppmärksamhet och medvetenhet</span><span class="e">Attention and awareness</span></h4>
+      <dl>
+        <dt><em class="p">vitakka</em> — directed attention</dt>
+        <dd class="s">Att rikta uppmärksamheten till objektet. Steg 1–3.</dd>
+        <dd class="e">Turning attention to the object. Stages 1–3.</dd>
+        <dt><em class="p">vicāra</em> — sustained attention</dt>
+        <dd class="s">Att hålla den kvar. Kan inte tvingas fram — tränas genom upprepad intention. Steg 3–6.</dd>
+        <dd class="e">Keeping it there. Cannot be forced by will — trained through repeated intention. Stages 3–6.</dd>
+        <dt><em class="p">sati</em> — mindfulness</dt>
+        <dd class="s">Inte fokus. Det optimala samspelet mellan uppmärksamhet och perifer medvetenhet.</dd>
+        <dd class="e">Not focus. The optimal interaction between attention and peripheral awareness.</dd>
+        <dt><em class="p">sampajañña</em> — introspective awareness</dt>
+        <dd class="s">Medvetenhet om sinnets eget tillstånd. Spontan (2), kontinuerlig (3–4), metakognitiv (6).</dd>
+        <dd class="e">Awareness of the mind's own state. Spontaneous (2), continuous (3–4), metacognitive (6).</dd>
+        <dt>Scope of attention</dt>
+        <dd class="s">Uppmärksamheten har en omfattning, inte bara ett mål. Steg 6 handlar om att definiera den.</dd>
+        <dd class="e">Attention has a size, not just a target. Stage 6 is about defining it deliberately.</dd>
+        <dt><span class="s">Tre spontana rörelser</span><span class="e">Three spontaneous movements</span></dt>
+        <dd class="s">Scanning, captured, alternating. Den sista <b>är</b> subtil distraktion.</dd>
+        <dd class="e">Scanning, captured, alternating. The last one <b>is</b> subtle distraction.</dd>
+        <dt><em class="p">ekaggatā</em> — unification of mind</dt>
+        <dd class="s">Culadasa läser den som enande av delsinnen, inte enpunktighet. Bär hela steg 7–10.</dd>
+        <dd class="e">Culadasa reads it as unification of sub-minds, not one-pointedness. Carries stages 7–10.</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h4><span class="s">Sinnesmodellen</span><span class="e">The mind-system</span></h4>
+      <dl>
+        <dt><span class="s">Medvetet / omedvetet sinne</span><span class="e">Conscious / unconscious mind</span></dt>
+        <dd class="s">Medvetandet är en arena där omedvetna delsinnen utbyter information. Ingen sitter vid ratten.</dd>
+        <dd class="e">Consciousness is an arena where unconscious sub-minds exchange information. Nobody is at the wheel.</dd>
+        <dt>Sensory · discriminating · narrating mind</dt>
+        <dd class="s">Rå upplevelse, tänkande och värdering, samt det berättande sinnet som tillverkar känslan av ett jag.</dd>
+        <dd class="e">Raw experience, thinking and evaluation, and the narrating mind that manufactures the sense of a self.</dd>
+        <dt>Moments of consciousness</dt>
+        <dd class="s">Diskreta ögonblick, hopbundna av binding moments till en skenbart sammanhängande ström.</dd>
+        <dd class="e">Discrete moments, tied by binding moments into an apparently continuous stream.</dd>
+        <dt>Non-perceiving moments</dt>
+        <dd class="s">Ögonblick där inget registreras. Dvala definieras mekaniskt som fler av dessa.</dd>
+        <dd class="e">Moments where nothing registers. Dullness is defined mechanically as more of these.</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h4><span class="s">Felmoder</span><span class="e">Failure modes</span></h4>
+      <dl>
+        <dt>Forgetting → mind-wandering</dt>
+        <dd class="s">Distraktion leder till forgetting, forgetting till vandring. Monkey mind är något annat: rastlöst hoppande.</dd>
+        <dd class="e">Distraction leads to forgetting, forgetting to wandering. Monkey mind is different: restless jumping.</dd>
+        <dt><em class="p">auddhatya</em> — scattering</dt>
+        <dd class="s">Den uppspelta felmoden. Grov distraktion (4), subtil distraktion (6).</dd>
+        <dd class="e">The excitable failure mode. Gross distraction (4), subtle distraction (6).</dd>
+        <dt><em class="p">laya</em> — sinking</dt>
+        <dd class="s">Den kollapsande. Stark dvala (4) glider mot sömn; subtil dvala (5) känns lugn och stabil.</dd>
+        <dd class="e">The collapsing one. Strong dullness (4) slides toward sleep; subtle dullness (5) feels calm and stable.</dd>
+        <dt><span class="s">Fem hinder</span><span class="e">Five hindrances</span></dt>
+        <dd class="s">Begär, aversion, tröghet, agitation, tvivel. De sju problemen är ytuttryck för dessa.</dd>
+        <dd class="e">Desire, aversion, lethargy, agitation, doubt. The seven problems are surface expressions of these.</dd>
+        <dt>Purifications of mind</dt>
+        <dd class="s">Lagrat emotionellt material som stiger upp när stabiliteten ökar. Väntat, inte fel.</dd>
+        <dd class="e">Stored emotional material rising as stability improves. Expected, not a malfunction.</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h4><span class="s">Frukterna</span><span class="e">The fruits</span></h4>
+      <dl>
+        <dt><em class="p">pīti</em> — meditative joy</dt>
+        <dd class="s">Energetisk glädje med fysiska inslag, graderad I–V. Grad V vid steg 8.</dd>
+        <dd class="e">Energetic joy with physical components, graded I–V. Grade V at stage 8.</dd>
+        <dt><em class="p">sukha</em> — pleasure, happiness</dt>
+        <dd class="s">Det stilla välbehag som följer när piti lagt sig.</dd>
+        <dd class="e">The settled contentment that follows once pīti calms.</dd>
+        <dt><em class="p">passaddhi</em> — pliancy</dt>
+        <dd class="s">Mental pliancy (7): uppmärksamhet utan ansträngning. Fysisk (8): kroppsligt obehag registreras inte.</dd>
+        <dd class="e">Mental pliancy (7): attention without effort. Physical (8): bodily discomfort stops registering.</dd>
+        <dt><em class="p">upekkhā</em> — equanimity</dt>
+        <dd class="s">Icke-reaktivitet mot behagligt och obehagligt. Gör insikt uthärdlig att se på.</dd>
+        <dd class="e">Non-reactivity to pleasant and unpleasant alike. Makes insight bearable to look at.</dd>
+        <dt><span class="s">Pacificering</span><span class="e">Pacification</span></dt>
+        <dd class="s">Två skilda händelser: tänkandet stillnar vid steg 7, sinnesintrycken vid steg 8.</dd>
+        <dd class="e">Two distinct events: thinking quiets at stage 7, sensory input at stage 8.</dd>
+        <dt><em class="p">nimitta</em> — illumination</dt>
+        <dd class="s">Inre ljus när sinnena stillnar. En skylt, inte en prestation.</dd>
+        <dd class="e">Inner light as the senses pacify. A signpost, not an achievement.</dd>
+        <dt><em class="p">upacāra samādhi</em> / <em class="p">jhāna</em></dt>
+        <dd class="s">Access concentration ≈ steg 6–7. Whole-body, pleasure och luminous jhāna — uttryckligen valfria stöd.</dd>
+        <dd class="e">Access concentration ≈ stages 6–7. Whole-body, pleasure and luminous jhāna — explicitly optional supports.</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h4><span class="s">Insikt och uppvaknande</span><span class="e">Insight and awakening</span></h4>
+      <dl>
+        <dt><em class="p">anicca · dukkha · anattā</em></dt>
+        <dd class="s">Förgänglighet, otillfredsställande, icke-själv. TMI lägger till śūnyatā och orsaksberoende: fem insikter.</dd>
+        <dd class="e">Impermanence, unsatisfactoriness, no-Self. TMI adds śūnyatā and causal interdependence: five insights.</dd>
+        <dt><em class="p">śūnyatā</em> — emptiness</dt>
+        <dd class="s">Inte att inget finns, utan att allt du upplever är sinnets konstruktion, inte tinget självt.</dd>
+        <dd class="e">Not that nothing exists, but that everything experienced is the mind's construction, not the thing itself.</dd>
+        <dt><em class="p">saṃyojana</em> — <span class="s">tio fetters</span><span class="e">ten fetters</span></dt>
+        <dd class="s">Uppvaknandekartan. Hålls medvetet skild från de tio stegen.</dd>
+        <dd class="e">The map of awakening. Deliberately kept separate from the ten stages.</dd>
+        <dt><span class="s">Fyra path moments</span><span class="e">Four path moments</span></dt>
+        <dd class="s">Sotāpanna, sakadāgāmī, anāgāmī, arahant. Diskreta händelser, inte steg man tränar sig igenom.</dd>
+        <dd class="e">Sotāpanna, sakadāgāmī, anāgāmī, arahant. Discrete events, not stages you practise through.</dd>
+        <dt>Cessation</dt>
+        <dd class="s">Ett glapp där medvetandet upphör. Mekanismen för att insikt blir permanent.</dd>
+        <dd class="e">A gap where consciousness stops. The mechanism by which insight becomes permanent.</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h4><span class="s">De sju problemen och motmedlen</span><span class="e">The seven problems and their antidotes</span></h4>
+      <dl>
+        <dt><span class="s">Prokrastinering och motstånd</span><span class="e">Procrastination and resistance</span></dt>
+        <dd class="s">Påminn dig om praktikens fördelar och börja bara.</dd>
+        <dd class="e">Recall the benefits of practice and simply begin.</dd>
+        <dt><span class="s">Distraktion, forgetting, vandring</span><span class="e">Distraction, forgetting, wandering</span></dt>
+        <dd class="s">Arbeta sekventiellt med stabilitetsteknikerna i steg 2–6.</dd>
+        <dd class="e">Work sequentially through the stability techniques of stages 2–6.</dd>
+        <dt><span class="s">Otålighet</span><span class="e">Impatience</span></dt>
+        <dd class="s">Observera tålmodigt och opartiskt. Odla positiva sinnestillstånd.</dd>
+        <dd class="e">Observe patiently and impartially. Cultivate positive states of mind.</dd>
+        <dt>Monkey mind</dt>
+        <dd class="s">Grunda dig i kroppen. Återgå till kroppsmedvetenhet.</dd>
+        <dd class="e">Ground in the body. Return to bodily awareness.</dd>
+        <dt><span class="s">Självtvivel</span><span class="e">Self-doubt</span></dt>
+        <dd class="s">Håll motivationen stark, bygg goda vanor, sluta jämföra.</dd>
+        <dd class="e">Keep motivation strong, build good habits, stop comparing.</dd>
+        <dt><span class="s">Dvala och dåsighet</span><span class="e">Dullness and drowsiness</span></dt>
+        <dd class="s">Energisera sinnet: djupa andetag, spänn musklerna, stående eller gående meditation.</dd>
+        <dd class="e">Energise the mind: deep breaths, tense the muscles, standing or walking meditation.</dd>
+        <dt><span class="s">Fysiskt obehag</span><span class="e">Physical discomfort</span></dt>
+        <dd class="s">Bekvämaste ställning först. Observera sedan obehaget opartiskt och acceptera det.</dd>
+        <dd class="e">Take the most comfortable posture, then observe the discomfort impartially and accept it.</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h4><span class="s">Teknikernas namn</span><span class="e">Technique names</span></h4>
+      <dl>
+        <dt>Body scanning · whole-body breath</dt>
+        <dd class="s">Bredda scope till hela kroppen. Motmedlet mot subtil dvala och bron in i steg 6.</dd>
+        <dd class="e">Widen scope to the whole body. The antidote to subtle dullness and the bridge into stage 6.</dd>
+        <dt>Pacifying the mind · still point</dt>
+        <dd class="s">Släppa ansträngningen medvetet, och vila i medvetenheten själv snarare än på ett objekt.</dd>
+        <dd class="e">Deliberately letting go of effort, and resting in awareness itself rather than on an object.</dd>
+        <dt><em class="p">mettā</em></dt>
+        <dd class="s">Stödpraktik hela vägen. Motmedel mot aversion, källa till glädjefaktorn.</dd>
+        <dd class="e">A supporting practice throughout. Antidote to aversion, source of the joy factor.</dd>
+      </dl>
+    </div>
+
+  </div>
+  </details>
+
+  <!-- ================= NAVIGATION (collapsible) ================= -->
+  <details class="fold" id="navigation">
+    <summary>
+      <span class="b-title">Navigation</span>
+      <span class="count">4</span>
+      <span class="b-sub"><span class="s">Det som avgör om kartan hjälper dig eller lurar dig — klicka för att fälla ut</span><span class="e">What decides whether the map helps you or misleads you — click to expand</span></span>
+      <span class="chev">▾</span>
+    </summary>
+  <div class="refgrid">
+
+    <div class="card tint-sky">
+      <h4><span class="s">Tre skillnader som låser upp boken</span><span class="e">Three distinctions that unlock the book</span></h4>
+      <p class="s"><b>Śamatha ≠ samādhi.</b> Samādhi är enbart stabil uppmärksamhet. Śamatha är hela paketet med fem faktorer: ansträngningslös stabilitet, kraftfull mindfulness, glädje, tranquility, jämnmod.</p>
+      <p class="e"><b>Śamatha ≠ samādhi.</b> Samādhi is stable attention alone. Śamatha is the whole five-factor package: effortless stability, powerful mindfulness, joy, tranquility, equanimity.</p>
+      <p class="s"><b>Mindfulness ≠ uppmärksamhet.</b> Sati är samspelet mellan uppmärksamhet och perifer medvetenhet, och växer med sinnets totala medvetandekraft.</p>
+      <p class="e"><b>Mindfulness ≠ attention.</b> Sati is the interaction between attention and peripheral awareness, and grows with the total conscious power of the mind.</p>
+      <p class="s"><b>Insikt ≠ förståelse.</b> Insikt är intuitiv och icke-begreppslig. Du kan förstå anattā intellektuellt i åratal utan ett enda insiktsögonblick.</p>
+      <p class="e"><b>Insight ≠ understanding.</b> Insight is intuitive and non-conceptual. You can understand anattā intellectually for years without a single moment of insight.</p>
+    </div>
+
+    <div class="card tint-mint">
+      <h4><span class="s">Förberedelse och grundfärdigheter</span><span class="e">Preparation and core skills</span></h4>
+      <p class="s"><b>Sexpunktsförberedelsen.</b> Motivation, mål för passet, förväntningar (släpp dem), diligence, distraktioner (inventera och lägg åt sidan), hållning.</p>
+      <p class="e"><b>Six-point preparation.</b> Motivation, goals for the session, expectations (drop them), diligence, distractions (inventory and set aside), posture.</p>
+      <p class="s"><b>Fyrstegs övergång.</b> Vidgad perifer medvetenhet → kroppen → andningen i kroppen → andningen vid näsan.</p>
+      <p class="e"><b>Four-step transition.</b> Open peripheral awareness → the body → the breath in the body → the breath at the nose.</p>
+      <p class="s"><b>De fyra färdigheterna.</b> Following (andetagets exakta början, slut och pauser), connecting (jämföra för att öka intresset), labeling (kort etikett på distraktionen), checking in (introspektiv blick bakåt).</p>
+      <p class="e"><b>The four skills.</b> Following (the breath's exact beginnings, ends and pauses), connecting (comparing to raise interest), labeling (a brief tag on the distraction), checking in (an introspective glance backward).</p>
+    </div>
+
+    <div class="card">
+      <h4><span class="s">Självdiagnos efter passet</span><span class="e">Self-diagnosis after a session</span></h4>
+      <p class="s">Notera bara tre saker: <b>huvudproblemet</b> (vandring / dvala / distraktion), om <b>objektet var levande eller dimmigt</b>, och om det krävdes <b>ansträngning</b>.</p>
+      <p class="e">Note three things only: <b>the main problem</b> (wandering / dullness / distraction), whether <b>the object was vivid or dim</b>, and whether <b>effort</b> was required.</p>
+      <p class="s">Gå på mästerskapskriterierna, inte på upplevelser. Piti och behag är indicier, inga mått. Ett steg räknas som klart först när kriteriet gäller konsekvent — inte enstaka gånger.</p>
+      <p class="e">Go by the mastery criteria, not by experiences. Pīti and pleasure are indications, not measures. A stage counts as complete only when the criterion holds consistently — not occasionally.</p>
+      <p class="s">Framsteg är inte linjära. Du rör dig fram och tillbaka mellan angränsande steg mellan pass.</p>
+      <p class="e">Progress is not linear. You move back and forth between adjacent stages from session to session.</p>
+    </div>
+
+    <div class="card tint-lilac flagcard">
+      <h4><span class="s">Fällan</span><span class="e">The trap</span></h4>
+      <p class="s"><b>Subtil dvala förväxlas med koncentration.</b> Den känns behaglig och stabil, vilket är exakt varför den är det mest underdiagnostiserade problemet i hela systemet.</p>
+      <p class="e"><b>Subtle dullness gets mistaken for concentration.</b> It feels pleasant and stable, which is exactly why it is the most under-diagnosed problem in the whole system.</p>
+      <p class="s">Två tecken värda att logga: skarpt ryck vid oväntat ljud under passet, och slö eller disig känsla efteråt. Båda pekar mot steg 5, inte uppåt.</p>
+      <p class="e">Two signs worth logging: a sharp startle at an unexpected sound during the session, and a dull or foggy feeling afterwards. Both point to stage 5, not upward.</p>
+      <p class="s">Culadasas omtolkningar av <em class="p">ekaggatā</em> och <em class="p">samādhi</em> är hans egna, inte konsensus. Andra lärare använder samma ord annorlunda.</p>
+      <p class="e">Culadasa's rereadings of <em class="p">ekaggatā</em> and <em class="p">samādhi</em> are his own, not consensus. Other teachers use the same words differently.</p>
+    </div>
+
+  </div>
+  </details>
+
+  <!-- ================= FACTS ================= -->
+  <div class="facts">
+    <div class="fact"><div class="big">10</div><div class="small"><span class="s">steg, grupperade i fyra milstolpar</span><span class="e">stages, grouped into four milestones</span></div></div>
+    <div class="fact"><div class="big">2</div><div class="small"><span class="s">spår som tränas parallellt, inte i sekvens</span><span class="e">tracks trained in parallel, not in sequence</span></div></div>
+    <div class="fact"><div class="big">5</div><div class="small"><span class="s">faktorer utgör śamatha — samādhi är bara en av dem</span><span class="e">factors make up śamatha — samādhi is only one</span></div></div>
+    <div class="fact"><div class="big">5</div><div class="small"><span class="s">insikter: anicca, dukkha, anattā, śūnyatā, orsaksberoende</span><span class="e">insights: anicca, dukkha, anattā, śūnyatā, interdependence</span></div></div>
+    <div class="fact"><div class="big">7</div><div class="small"><span class="s">praktiska problem, alla ytuttryck för fem hinder</span><span class="e">practical problems, all surface forms of five hindrances</span></div></div>
+    <div class="fact focal"><div class="big">0</div><div class="small"><span class="s">steg som kan hoppas över</span><span class="e">stages that can be skipped</span></div></div>
+  </div>
+
+  <div class="footnote">The Mind Illuminated · Culadasa (John Yates), 2015 · <span class="s">interaktiv stegkarta — vad varje steg är, och hur du praktiskt gör</span><span class="e">interactive stage map — what each stage is, and how you actually practise it</span></div>
+</div>
+
+<script>
+  /* ---------- Flip interaction ---------- */
+  var flips = document.querySelectorAll('.flip');
+  flips.forEach(function (card) {
+    card.addEventListener('click', function () {
+      card.classList.toggle('flipped');
+      syncButton();
+    });
+  });
+  var btn = document.getElementById('toggleAll');
+  btn.addEventListener('click', function (ev) {
+    ev.stopPropagation();
+    var anyUnflipped = Array.prototype.some.call(flips, function (c) { return !c.classList.contains('flipped'); });
+    flips.forEach(function (c) { c.classList.toggle('flipped', anyUnflipped); });
+    syncButton();
+  });
+  function syncButton() {
+    var allFlipped = Array.prototype.every.call(flips, function (c) { return c.classList.contains('flipped'); });
+    btn.classList.toggle('active', allFlipped);
+  }
+
+  /* ---------- Language ---------- */
+  function setLang(l) {
+    document.body.className = l;
+    document.getElementById('b-sv').classList.toggle('active', l === 'sv');
+    document.getElementById('b-en').classList.toggle('active', l === 'en');
+    fitAll();
+  }
+
+  /* ---------- Fit-text: card sizes are fixed, text adapts ---------- */
+  var FIT_BASE = 12.5, FIT_MIN = 8.5, FIT_STEP = 0.25;
+  function fitFace(face) {
+    face.style.fontSize = FIT_BASE + 'px';
+    var size = FIT_BASE;
+    while ((face.scrollHeight > face.clientHeight + 0.5 || face.scrollWidth > face.clientWidth + 0.5) && size > FIT_MIN) {
+      size -= FIT_STEP;
+      face.style.fontSize = size + 'px';
+    }
+  }
+  function fitAll() { document.querySelectorAll('.face').forEach(fitFace); }
+  fitAll();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitAll); }
+  var rzTimer;
+  window.addEventListener('resize', function () { clearTimeout(rzTimer); rzTimer = setTimeout(fitAll, 150); });
+</script>
+</body>
+</html>
